@@ -18,7 +18,7 @@
 // the page behaves exactly as before.
 //
 // Storage key `ay-theme` sits next to `ay-consent`. No build step; vanilla
-// ES2017. Loaded once per page via <script src="/theme-toggle.js" defer>.
+// ES5. Loaded once per page via <script src="/theme-toggle.js" defer>.
 (function () {
   "use strict";
 
@@ -60,6 +60,19 @@
     if (media.addEventListener) media.addEventListener("change", onSystemChange);
     else if (media.addListener) media.addListener(onSystemChange);
   }
+
+  // Desktop: the CSS parks the button in the titlebar's right gutter, out of
+  // the flow, so it can never change the titlebar's height. Keep it level with
+  // the first row: the nav's row when the nav fits beside the path, the path's
+  // own row when the nav wraps below it. (On mobile the button is static and
+  // `top` does nothing.)
+  var left = bar.querySelector(".titlebar__left");
+  function level() {
+    if (left) btn.style.top = left.offsetTop + left.offsetHeight / 2 + "px";
+  }
+  window.addEventListener("resize", level);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(level);
+  level();
 
   bar.classList.add("theme-enhanced");
   render();
